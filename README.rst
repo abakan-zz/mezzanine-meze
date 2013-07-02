@@ -20,19 +20,19 @@ Quick start
    ``mezzanine.blog.models.BlogPost`` and
    ``mezzanine.pages.models.RichTextPage.source`` models as follows::
 
-   help_text = ("Source in reStructuredText format will be converted to "
-                "HTML and result will replace content field.")
-   EXTRA_MODEL_FIELDS = (
-       # Enable Meze for blog posts
-       ("mezzanine.blog.models.BlogPost.source",
-        "TextField", (), {"blank": True, "help_text": help_text}),
-       ("mezzanine.blog.models.BlogPost.convert",
-        "BooleanField", ("Convert source",), {"default": True}),
-       # Enable Meze for rich text pages
-       ("mezzanine.pages.models.RichTextPage.source",
-        "TextField", (), {"blank": True, "help_text": help_text}),
-       ("mezzanine.pages.models.RichTextPage.convert",
-        "BooleanField", ("Convert source",), {"default": True}),
-   )
-   del help_text
+     help_text = ("Source in reStructuredText format will be converted to "
+                  "HTML and result will replace content field.")
+     EXTRA_MODEL_FIELDS = (
+         # Enable Meze for blog posts
+         ("mezzanine.blog.models.BlogPost.source",
+          "TextField", (), {"blank": True, "help_text": help_text}),
+         ("mezzanine.blog.models.BlogPost.convert",
+          "BooleanField", ("Convert source",), {"default": True}),
+         # Enable Meze for rich text pages
+         ("mezzanine.pages.models.RichTextPage.source",
+          "TextField", (), {"blank": True, "help_text": help_text}),
+         ("mezzanine.pages.models.RichTextPage.convert",
+          "BooleanField", ("Convert source",), {"default": True}),
+     )
+     del help_text
 
