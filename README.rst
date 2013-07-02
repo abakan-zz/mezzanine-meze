@@ -25,17 +25,18 @@ If you have easy_install available on your system, just type:
 Quick start
 -----------
 
+Make the following changes in your project ``settings.py`` file:
 
-1. Add "meze" to your ``INSTALLED_APPS`` setting like this::
+1. Add "meze" to ``INSTALLED_APPS``::
 
      INSTALLED_APPS = (
          ...
          'meze',
      )
 
-2. Edit your project ``settings.py`` file to inject ``source`` and
-   ``convert`` fields to ``mezzanine.blog.models.BlogPost`` and
-   ``mezzanine.pages.models.RichTextPage.source`` models as follows::
+2. Inject ``source`` and ``convert`` fields to
+   ``mezzanine.blog.models.BlogPost`` and
+   ``mezzanine.pages.models.RichTextPage.source`` models::
 
      help_text = ("Source in reStructuredText format will be converted to "
                   "HTML and result will replace content field.")
@@ -53,7 +54,7 @@ Quick start
      )
      del help_text
 
-3. Add ``MEZE_SETTINGS`` to ``settings.py``::
+3. Add ``MEZE_SETTINGS``::
 
      MEZE_SETTINGS = {
       'workdir': os.path.join(PROJECT_ROOT, 'meze_workdir'),
@@ -64,7 +65,8 @@ Quick start
    Sphinx is currently the only builder.
 
 
-4. If you have started using Meze afte
+4. If you have started using Meze after creating database, you may need to
+   make a migration. See field injection `caveats`_ in Mezzanine documentation.
 
 .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
 
