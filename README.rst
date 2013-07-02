@@ -70,11 +70,28 @@ Make the following changes in your project ``settings.py`` file:
 
 .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
 
+5. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
+   add ``pygments.css`` file to your template::
+
+      {% compress css %}
+      ...
+      <link rel="stylesheet" href="{% static "css/pygments.css" %}">
+      ...
+
+   For Python code, you can also add ``copybutton.js`` file, which will
+   help displaying code in a copy friendly format::
+
+      {% compress js %}
+      ...
+      <script src="{% static "js/copybutton.js" %}"></script>
+      ...
+
+.. _Pygments: http://pygments.org/
 
 How does it work?
 -----------------
 
-Meze starts a `Sphinx`_ project in :``workdir`` by creating a simple
+Meze starts a `Sphinx`_ project in ``workdir`` by creating a simple
 configuration file (``conf.py``) and an HTML template
 (``templates/layout.html``). `Configuration` file can be customized to
 add more Sphinx extensions.
