@@ -2,7 +2,7 @@ Meze
 ====
 
 Meze adds `Sphinx`_ flavor to `Mezzanine`_. You can write your blog posts and
-pages in `reStructuredText`_ and get them converted into HTML using Sphinx.
+pages in `reStructuredText`_ and get them converted into HTML via Sphinx.
 
 .. _Sphinx: http://sphinx-doc.org/
 .. _Mezzanine: http://mezzanine.jupo.org/
