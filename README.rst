@@ -13,6 +13,15 @@ Requirements
 
 `Sphinx`_ is required to convert reStructuredText source.
 
+Installation
+------------
+
+If you have easy_install available on your system, just type:
+
+::
+
+   easy_install -U Meze
+
 Quick start
 -----------
 
@@ -24,7 +33,7 @@ Quick start
          'meze',
      )
 
-2. Edit your project :file:`settings.py` file to inject ``source`` and
+2. Edit your project ``settings.py`` file to inject ``source`` and
    ``convert`` fields to ``mezzanine.blog.models.BlogPost`` and
    ``mezzanine.pages.models.RichTextPage.source`` models as follows::
 
@@ -44,15 +53,33 @@ Quick start
      )
      del help_text
 
-3. Add ``MEZE_SETTINGS`` to :file:`settings.py`::
+3. Add ``MEZE_SETTINGS`` to ``settings.py``::
 
      MEZE_SETTINGS = {
       'workdir': os.path.join(PROJECT_ROOT, 'meze_workdir'),
       'builder': 'sphinx',
      }
 
-   Default values are shown. You will need write access to :file:`workdir`.
+   Default values are shown. You will need write access to ``workdir``.
+   Sphinx is currently the only builder.
 
 
+4. If you have started using Meze afte
 
 .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
+
+
+How does it work?
+-----------------
+
+Meze starts a `Sphinx`_ project in :``workdir`` by creating a simple
+configuration file (``conf.py``) and an HTML template
+(``templates/layout.html``). `Configuration` file can be customized to
+add more Sphinx extensions.
+
+.. _Configuration: http://sphinx-doc.org/config.html
+
+reStructuredText files are written into ``workdir``, HTML files are built
+using Sphinx, and content of HTML files are stored in the database.
+
+
