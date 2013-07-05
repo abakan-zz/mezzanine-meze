@@ -11,13 +11,13 @@ from mezzanine.pages.models import RichTextPage
 from .build import rst2html
 
 blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
-blog_fieldsets[0][1]["fields"].insert(-2, ("source", "convert"))
+blog_fieldsets[0][1]["fields"].insert(-2, "source")
+blog_fieldsets[0][1]["fields"].insert(-2, "convert")
 
 
-class BlogPostForm(forms.ModelForm):
+class MezeForm(forms.ModelForm):
 
-    class Meta:
-        model = BlogPost
+    root = ""
 
     def __init__(self, *args, **kwargs):
 
@@ -39,13 +39,22 @@ class BlogPostForm(forms.ModelForm):
                     if slug != old_slug:
                         old_slug = None
                     else:
-                        old_slug = os.path.join('blog', slug)
-                    slug = os.path.join('blog', slug)
+                        old_slug = os.path.join(self.root, slug)
+                    slug = os.path.join(self.root, slug)
 
                     (data['content'],
                      data['meze_messages']) = rst2html(source, slug, old_slug)
 
-        super(BlogPostForm, self).__init__(*args, **kwargs)
+        super(MezeForm, self).__init__(*args, **kwargs)
+
+
+class BlogPostForm(MezeForm):
+
+    root = "blog"
+
+    class Meta:
+
+        model = BlogPost
 
 
 class BlogPostAdmin_(BlogPostAdmin):
@@ -70,7 +79,18 @@ admin.site.unregister(BlogPost)
 admin.site.register(BlogPost, BlogPostAdmin_)
 
 
+class RichTextForm(MezeForm):
+
+    root = ""
+
+    class Meta:
+
+        model = RichTextPage
+
+
 class RichTextAdmin(PageAdmin):
+
+    form = RichTextForm
 
     class Media:
 
@@ -78,10 +98,11 @@ class RichTextAdmin(PageAdmin):
 
     def save_model(self, request, obj, form, change):
 
+        for level, message in form.data.get('meze_messages', []):
+            messages.add_message(request, level, message)
+
         super(RichTextAdmin, self).save_model(request, obj, form, change)
-        if obj.source:
-            obj.content = rst2html(obj.source, obj.slug)
-        obj.save()
+
 
 admin.site.unregister(RichTextPage)
 admin.site.register(RichTextPage, RichTextAdmin)
