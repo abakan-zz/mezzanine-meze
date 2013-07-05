@@ -1,3 +1,4 @@
+import re
 import os
 import time
 from django.conf import settings
@@ -7,6 +8,8 @@ from django.contrib import messages
 SETTINGS = settings.MEZE_SETTINGS
 BUILDER = SETTINGS.get('builder', 'sphinx').lower()
 REMOVE = SETTINGS.get('remove', 'all')
+
+HEADER2 = SETTINGS.get('header2', True)
 
 SPHINX_ROOT = WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
 SPHINX_BUILD = os.path.join(SPHINX_ROOT, '_build')
@@ -32,7 +35,6 @@ version = release = '0'
 
 master_doc = 'index'
 
-
 exclude_patterns = ['_build', 'templates']
 #html_static_path = ['static']
 templates_path = ['templates']
@@ -43,7 +45,7 @@ html_sidebars = {'**': []}
 html_domain_indices = False
 html_use_index = False
 html_show_sourcelink = False
-
+html_add_permalinks = None
 
 source_suffix = '.rst'
 extensions = ['sphinx.ext.intersphinx']
@@ -95,7 +97,8 @@ def sphinx_build(source, slug='index', old_slug=None):
                 os.remove(fname)
 
     rst = os.path.join(folder, filename + '.rst')
-    with open(rst, 'w') as inp:
+    import codecs
+    with codecs.open(rst, encoding='utf-8', mode='w') as inp:
         inp.write(source)
 
     cwd = os.getcwd()
@@ -121,4 +124,11 @@ def rst2html(rst, slug=None, old_slug=None):
     else:
         raise ValueError('unknown builder: ' + BUILDER)
 
-    return builder(rst, slug, old_slug)
+    content, meze_messages = builder(rst, slug, old_slug)
+    if HEADER2:
+        content = re.sub('<h5>(.*)</h5>', '<h6>\\1</h6>', content)
+        content = re.sub('<h4>(.*)</h4>', '<h5>\\1</h5>', content)
+        content = re.sub('<h3>(.*)</h3>', '<h4>\\1</h4>', content)
+        content = re.sub('<h2>(.*)</h2>', '<h3>\\1</h3>', content)
+        content = re.sub('<h1>(.*)</h1>', '<h2>\\1</h2>', content)
+    return content, meze_messages
