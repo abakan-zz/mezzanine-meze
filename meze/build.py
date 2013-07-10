@@ -3,11 +3,15 @@ import os
 import sys
 import time
 import codecs
+import StringIO
 
 from django.conf import settings
 from django.contrib import messages
 
+from docutils.io import Input, FileInput
+
 from sphinx import builders
+from sphinx import environment
 from sphinx.application import Sphinx
 from sphinx.util.console import nocolor
 from sphinx.builders.html import SerializingHTMLBuilder
@@ -20,7 +24,6 @@ try:
 except AttributeError:
     SETTINGS = {}
 
-HEADER2 = SETTINGS.get('header2', True)
 WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
 
 
@@ -124,7 +127,7 @@ class MezeStream(object):
         self.stream.flush()
 
 
-def sphinx_build(source, slug='index', old_slug=None):
+def sphinx_build(source, slug='index'):
     """Write source file and build using Sphinx."""
 
     meze_messages = []
@@ -132,13 +135,34 @@ def sphinx_build(source, slug='index', old_slug=None):
                        'index' + SPHINX_CONF.get('source_suffix', '.rst'))
     with codecs.open(rst, encoding='utf-8', mode='w') as out:
         out.write(source)
-
+    CONF = SPHINX_CONF#.copy()
+    #CONF['master_doc'] = slug
     start = time.time()
     status = MezeStream(sys.stdout)
     warning = MezeStream(sys.stderr)
+
+    def get_matching_docs(dirname, suffix, exclude_matchers=(),
+                          found_docs=set([slug])):
+        """Match only slug."""
+
+        return found_docs
+
+    class FakeFileInput(FileInput):
+
+        def __init__(self, source=StringIO.StringIO(source), source_path=None,
+                     encoding=None, error_handler='strict',
+                     autoclose=True, handle_io_errors=True, mode='rU'):
+            FileInput.__init__(self, source=source, source_path=None,
+                               encoding=None, error_handler='strict',
+                               autoclose=True, handle_io_errors=True,
+                               mode='rU')
+
+    #environment.get_matching_docs = get_matching_docs
+    #environment.FileInput = FakeFileInput
+
     Sphinx(srcdir=WORKDIR, confdir=None, outdir=WORKDIR,
            doctreedir=WORKDIR, buildername='meze',
-           confoverrides=SPHINX_CONF, status=status, warning=warning,
+           confoverrides=CONF, status=status, warning=warning,
            freshenv=False, warningiserror=False, tags=[]).build(False, [rst])
     meze_messages.append((messages.INFO,
                           'Source was converted into HTML using Sphinx in '
@@ -149,14 +173,17 @@ def sphinx_build(source, slug='index', old_slug=None):
     return content, meze_messages
 
 
-def rst2html(rst, slug=None, old_slug=None):
+def rst2html(rst, slug=None):
 
     sphinx_setup()
-    content, meze_messages = sphinx_build(rst, slug, old_slug)
-    if HEADER2:
-        content = re.sub('<h5>(.*)</h5>', '<h6>\\1</h6>', content)
-        content = re.sub('<h4>(.*)</h4>', '<h5>\\1</h5>', content)
-        content = re.sub('<h3>(.*)</h3>', '<h4>\\1</h4>', content)
-        content = re.sub('<h2>(.*)</h2>', '<h3>\\1</h3>', content)
-        content = re.sub('<h1>(.*)</h1>', '<h2>\\1</h2>', content)
+    content, meze_messages = sphinx_build(rst, slug)
+    # downgrade headers
+    content = re.sub('<h5>(.*)</h5>', '<h6>\\1</h6>', content)
+    content = re.sub('<h4>(.*)</h4>', '<h5>\\1</h5>', content)
+    content = re.sub('<h3>(.*)</h3>', '<h4>\\1</h4>', content)
+    content = re.sub('<h2>(.*)</h2>', '<h3>\\1</h3>', content)
+    content = re.sub('<h1>(.*)</h1>', '<h2>\\1</h2>', content)
+    # correct image source
+    content = re.sub('src=\"(.*)\"', 'src=\"/\\1\"', content)
+    content = re.sub('src=\"/(http[s]:.*)\"', 'src=\"\\1\"', content)
     return content, meze_messages

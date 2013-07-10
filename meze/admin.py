@@ -28,22 +28,16 @@ class MezeForm(forms.ModelForm):
             except KeyError:
                 pass
             else:
-                old_source = old_slug = None
+                old_source = None
                 if 'instance' in kwargs:
                     obj = kwargs['instance']
                     old_source = obj.source
-                    old_slug = obj.slug
 
                 if source != old_source:
-                    slug = data['slug']
-                    if slug != old_slug:
-                        old_slug = None
-                    else:
-                        old_slug = os.path.join(self.root, slug)
-                    slug = os.path.join(self.root, slug)
+                    slug = os.path.join(self.root, data['slug'])
 
                     (data['content'],
-                     data['meze_messages']) = rst2html(source, slug, old_slug)
+                     data['meze_messages']) = rst2html(source, slug)
 
         super(MezeForm, self).__init__(*args, **kwargs)
 
