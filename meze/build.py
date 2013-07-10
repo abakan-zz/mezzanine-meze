@@ -1,68 +1,62 @@
 import re
 import os
+import sys
 import time
+import codecs
+
 from django.conf import settings
 from django.contrib import messages
 
+from sphinx import builders
+from sphinx.application import Sphinx
+from sphinx.util.console import nocolor
+from sphinx.builders.html import SerializingHTMLBuilder
+from sphinx.util.osutil import ensuredir, os_path
 
-SETTINGS = settings.MEZE_SETTINGS
-BUILDER = SETTINGS.get('builder', 'sphinx').lower()
+nocolor()
+
+try:
+    SETTINGS = settings.MEZE_SETTINGS
+except AttributeError:
+    SETTINGS = {}
 
 HEADER2 = SETTINGS.get('header2', True)
+WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
 
-SPHINX_ROOT = SETTINGS.get('workdir', settings.PROJECT_ROOT)
-SPHINX_CONF = """# -*- coding: utf-8 -*-
-# A simple Sphinx configuration
 
-# following are not needed
-project = u''
-copyright = u''
-version = release = '0'
-
-master_doc = 'index'
-
-pygments_style = 'sphinx'
-html_theme = 'default'
-html_sidebars = {'**': []}
-html_domain_indices = False
-html_use_index = False
-html_show_sourcelink = False
-html_add_permalinks = None
-
-source_suffix = '.rst'
-extensions = ['sphinx.ext.intersphinx']
-
-intersphinx_mapping = {
-    'python': ('http://docs.python.org/', None),
-}
-
-extlinks = {
-    'wiki': ('http://en.wikipedia.org/wiki/%s', ''),
-}
-"""
+try:
+    SPHINX_CONF = settings.SPHINX_CONF
+except AttributeError:
+    SPHINX_CONF = {
+        'project': u'',
+        'copyright': u'',
+        'version': '0',
+        'release': '0',
+        'master_doc': 'index',
+        'pygments_style': 'sphinx',
+        'html_theme': 'default',
+        'html_sidebars': {'**': []},
+        'html_domain_indices': False,
+        'html_use_index': False,
+        'html_show_sourcelink': False,
+        'html_add_permalinks': None,
+        'source_suffix': '.rst',
+        'extensions': ['sphinx.ext.intersphinx'],
+        'intersphinx_mapping': {
+            'python': ('http://docs.python.org/', None),
+        },
+        'extlinks': {
+            'wiki': ('http://en.wikipedia.org/wiki/%s', ''),
+        }
+    }
 
 
 def sphinx_setup():
     """Make working directory and write configuration file."""
 
-    for folder in [SPHINX_ROOT]:
+    for folder in [WORKDIR]:
         if not os.path.isdir(folder):
             os.makedirs(folder)
-
-    conf = os.path.join(SPHINX_ROOT, 'conf.py')
-    if not os.path.isfile(conf):
-        with open(conf, 'w') as out:
-            out.write(SPHINX_CONF)
-
-
-import sys
-import codecs
-from sphinx import builders
-from sphinx.application import Sphinx
-from sphinx.util.console import nocolor
-from sphinx.builders.html import SerializingHTMLBuilder
-
-nocolor()
 
 
 class MezeBuilder(SerializingHTMLBuilder):
@@ -71,7 +65,7 @@ class MezeBuilder(SerializingHTMLBuilder):
     implementation_dumps_unicode = True
     name = 'meze'
     out_suffix = ''
-
+    copysource = False
     context = None
 
     def init(self):
@@ -82,6 +76,23 @@ class MezeBuilder(SerializingHTMLBuilder):
         """Save context as class variable."""
 
         MezeBuilder.context = context
+
+    def handle_page(self, pagename, ctx, templatename='page.html',
+                    outfilename=None, event_arg=None):
+        """Do not copy sources."""
+
+        ctx['current_page_name'] = pagename
+        self.add_sidebars(pagename, ctx)
+
+        if not outfilename:
+            outfilename = os.path.join(self.outdir,
+                                       os_path(pagename) + self.out_suffix)
+
+        self.app.emit('html-page-context', pagename, templatename,
+                      ctx, event_arg)
+
+        ensuredir(os.path.dirname(outfilename))
+        self.dump_context(ctx, outfilename)
 
     def finish(self):
         """Do not write object inventory and search index."""
@@ -114,22 +125,21 @@ class MezeStream(object):
 
 
 def sphinx_build(source, slug='index', old_slug=None):
-    """Write source into `index.rst` and build using Sphinx."""
+    """Write source file and build using Sphinx."""
 
     meze_messages = []
-    rst = os.path.join(SPHINX_ROOT, 'index.rst')
-    with codecs.open(rst, encoding='utf-8', mode='w') as inp:
-        inp.write(source)
-    start = time.time()
+    rst = os.path.join(WORKDIR,
+                       'index' + SPHINX_CONF.get('source_suffix', '.rst'))
+    with codecs.open(rst, encoding='utf-8', mode='w') as out:
+        out.write(source)
 
+    start = time.time()
     status = MezeStream(sys.stdout)
     warning = MezeStream(sys.stderr)
-
-    Sphinx(srcdir=SPHINX_ROOT, confdir=SPHINX_ROOT, outdir=SPHINX_ROOT,
-           doctreedir=os.path.join(SPHINX_ROOT, '.doctrees'),
-           buildername='meze', confoverrides={},
-           status=status, warning=warning, freshenv=False,
-           warningiserror=False, tags=[]).build(False, [rst])
+    Sphinx(srcdir=WORKDIR, confdir=None, outdir=WORKDIR,
+           doctreedir=WORKDIR, buildername='meze',
+           confoverrides=SPHINX_CONF, status=status, warning=warning,
+           freshenv=False, warningiserror=False, tags=[]).build(False, [rst])
     meze_messages.append((messages.INFO,
                           'Source was converted into HTML using Sphinx in '
                           '{:.2f}'.format(time.time() - start)))
@@ -141,13 +151,8 @@ def sphinx_build(source, slug='index', old_slug=None):
 
 def rst2html(rst, slug=None, old_slug=None):
 
-    if BUILDER == 'sphinx':
-        sphinx_setup()
-        builder = sphinx_build
-    else:
-        raise ValueError('unknown builder: ' + BUILDER)
-
-    content, meze_messages = builder(rst, slug, old_slug)
+    sphinx_setup()
+    content, meze_messages = sphinx_build(rst, slug, old_slug)
     if HEADER2:
         content = re.sub('<h5>(.*)</h5>', '<h6>\\1</h6>', content)
         content = re.sub('<h4>(.*)</h4>', '<h5>\\1</h5>', content)
