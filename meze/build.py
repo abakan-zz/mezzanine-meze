@@ -7,24 +7,10 @@ from django.contrib import messages
 
 SETTINGS = settings.MEZE_SETTINGS
 BUILDER = SETTINGS.get('builder', 'sphinx').lower()
-REMOVE = SETTINGS.get('remove', 'all')
 
 HEADER2 = SETTINGS.get('header2', True)
 
-SPHINX_ROOT = WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
-SPHINX_BUILD = os.path.join(SPHINX_ROOT, '_build')
-SPHINX_TEMPLATES = os.path.join(SPHINX_ROOT, 'templates')
-
-SPHINX_INDEX = """
-.. toctree::
-   :glob:
-
-   *
-   */*
-   */*/*
-   */*/*/*
-"""
-SPHINX_LAYOUT = "{% block body %}{% endblock %}"
+SPHINX_ROOT = SETTINGS.get('workdir', settings.PROJECT_ROOT)
 SPHINX_CONF = """# -*- coding: utf-8 -*-
 # A simple Sphinx configuration
 
@@ -34,10 +20,6 @@ copyright = u''
 version = release = '0'
 
 master_doc = 'index'
-
-exclude_patterns = ['_build', 'templates']
-#html_static_path = ['static']
-templates_path = ['templates']
 
 pygments_style = 'sphinx'
 html_theme = 'default'
@@ -61,15 +43,11 @@ extlinks = {
 
 
 def sphinx_setup():
+    """Make working directory and write configuration file."""
 
-    for folder in [SPHINX_ROOT, SPHINX_BUILD, SPHINX_TEMPLATES]:
+    for folder in [SPHINX_ROOT]:
         if not os.path.isdir(folder):
             os.makedirs(folder)
-
-    layout = os.path.join(SPHINX_TEMPLATES, 'layout.html')
-    if not os.path.isfile(layout):
-        with open(layout, 'w') as out:
-            out.write(SPHINX_LAYOUT)
 
     conf = os.path.join(SPHINX_ROOT, 'conf.py')
     if not os.path.isfile(conf):
@@ -77,42 +55,87 @@ def sphinx_setup():
             out.write(SPHINX_CONF)
 
 
+import sys
+import codecs
+from sphinx import builders
+from sphinx.application import Sphinx
+from sphinx.util.console import nocolor
+from sphinx.builders.html import SerializingHTMLBuilder
+
+nocolor()
+
+
+class MezeBuilder(SerializingHTMLBuilder):
+
+    implementation = None
+    implementation_dumps_unicode = True
+    name = 'meze'
+    out_suffix = ''
+
+    context = None
+
+    def init(self):
+
+        SerializingHTMLBuilder.init(self)
+
+    def dump_context(self, context, filename):
+        """Save context as class variable."""
+
+        MezeBuilder.context = context
+
+    def finish(self):
+        """Do not write object inventory and search index."""
+
+        pass
+
+# Sphinx.add_builder needs to be called after instantiation
+# but builder is initialized during instantiation
+# adding MezeBuilder to built-in builders
+builders.BUILTIN_BUILDERS['meze'] = MezeBuilder
+
+
+class MezeStream(object):
+
+    """Hold messages written to a stream."""
+
+    def __init__(self, stream):
+
+        self.stream = stream
+        self.messages = []
+
+    def write(self, str):
+
+        self.stream.write(str)
+        self.messages.append(str)
+
+    def flush(self, *args, **kwargs):
+
+        self.stream.flush()
+
+
 def sphinx_build(source, slug='index', old_slug=None):
+    """Write source into `index.rst` and build using Sphinx."""
 
-    from sphinx import main
     meze_messages = []
-    if slug != 'index':
-        rst = os.path.join(SPHINX_ROOT, 'index.rst')
-        with open(rst, 'w') as out:
-            out.write(SPHINX_INDEX)
-
-    folder, filename = os.path.split(os.path.join(SPHINX_ROOT, slug))
-    if folder and not os.path.isdir(folder):
-        os.makedirs(folder)
-
-    if old_slug:
-        for fname in [os.path.join(SPHINX_ROOT, old_slug + '.rst'),
-                      os.path.join(SPHINX_BUILD, old_slug + '.html')]:
-            if os.path.isfile(fname):
-                os.remove(fname)
-
-    rst = os.path.join(folder, filename + '.rst')
-    import codecs
+    rst = os.path.join(SPHINX_ROOT, 'index.rst')
     with codecs.open(rst, encoding='utf-8', mode='w') as inp:
         inp.write(source)
-
-    cwd = os.getcwd()
-    os.chdir(SPHINX_ROOT)
     start = time.time()
-    main(['sphinx-build', SPHINX_ROOT, SPHINX_BUILD, rst])
+
+    status = MezeStream(sys.stdout)
+    warning = MezeStream(sys.stderr)
+
+    Sphinx(srcdir=SPHINX_ROOT, confdir=SPHINX_ROOT, outdir=SPHINX_ROOT,
+           doctreedir=os.path.join(SPHINX_ROOT, '.doctrees'),
+           buildername='meze', confoverrides={},
+           status=status, warning=warning, freshenv=False,
+           warningiserror=False, tags=[]).build(False, [rst])
     meze_messages.append((messages.INFO,
                           'Source was converted into HTML using Sphinx in '
                           '{:.2f}'.format(time.time() - start)))
-    os.chdir(cwd)
-
-    html = os.path.join(SPHINX_BUILD, slug + '.html')
-    with open(html) as inp:
-        content = inp.read().strip()
+    for msg in warning.messages:
+        meze_messages.append((messages.WARNING, msg))
+    content = MezeBuilder.context['body']
     return content, meze_messages
 
 
