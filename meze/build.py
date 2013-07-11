@@ -27,39 +27,31 @@ except AttributeError:
 WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
 
 
-try:
-    SPHINX_CONF = settings.SPHINX_CONF
-except AttributeError:
-    SPHINX_CONF = {
-        'project': u'',
-        'copyright': u'',
-        'version': '0',
-        'release': '0',
-        'master_doc': 'index',
-        'pygments_style': 'sphinx',
-        'html_theme': 'default',
-        'html_sidebars': {'**': []},
-        'html_domain_indices': False,
-        'html_use_index': False,
-        'html_show_sourcelink': False,
-        'html_add_permalinks': None,
-        'source_suffix': '.rst',
-        'extensions': ['sphinx.ext.intersphinx'],
-        'intersphinx_mapping': {
-            'python': ('http://docs.python.org/', None),
-        },
-        'extlinks': {
-            'wiki': ('http://en.wikipedia.org/wiki/%s', ''),
-        }
-    }
+SPHINX_CONF = settings.SPHINX_CONF or """
+project = u''
+copyright = u''
+version = '0'
+release = '0'
+master_doc = 'index'
+pygments_style = 'sphinx'
+html_theme = 'default'
+html_sidebars = {'**': []}
+html_domain_indices = False
+html_use_index = False
+html_show_sourcelink = False
+html_add_permalinks = None
+source_suffix = '.rst'
+intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
+extlinks = {'wiki': ('http://en.wikipedia.org/wiki/%s', ''),}
+extensions = ['sphinx.ext.intersphinx', 'sphinx.ext.extlinks']
+"""
 
 
 def sphinx_setup():
     """Make working directory and write configuration file."""
 
-    for folder in [WORKDIR]:
-        if not os.path.isdir(folder):
-            os.makedirs(folder)
+    if not os.path.isdir(WORKDIR):
+        os.makedirs(WORKDIR)
 
 
 class MezeBuilder(SerializingHTMLBuilder):
@@ -131,12 +123,6 @@ def sphinx_build(source, slug='index'):
     """Write source file and build using Sphinx."""
 
     meze_messages = []
-    rst = os.path.join(WORKDIR,
-                       'index' + SPHINX_CONF.get('source_suffix', '.rst'))
-    with codecs.open(rst, encoding='utf-8', mode='w') as out:
-        out.write(source)
-    CONF = SPHINX_CONF#.copy()
-    #CONF['master_doc'] = slug
     start = time.time()
     status = MezeStream(sys.stdout)
     warning = MezeStream(sys.stderr)
@@ -160,16 +146,29 @@ def sphinx_build(source, slug='index'):
     #environment.get_matching_docs = get_matching_docs
     #environment.FileInput = FakeFileInput
 
-    Sphinx(srcdir=WORKDIR, confdir=None, outdir=WORKDIR,
-           doctreedir=WORKDIR, buildername='meze',
-           confoverrides=CONF, status=status, warning=warning,
-           freshenv=False, warningiserror=False, tags=[]).build(False, [rst])
+    app = Sphinx(srcdir=WORKDIR, confdir=WORKDIR, outdir=WORKDIR,
+                 doctreedir=WORKDIR, buildername='meze',
+                 confoverrides={}, status=status, warning=warning,
+                 freshenv=False, warningiserror=False, tags=[])
+
+    rst = os.path.join(WORKDIR, 'index' + app.config.source_suffix)
+    with codecs.open(rst, encoding='utf-8', mode='w') as out:
+        out.write(source)
+
+    conf = os.path.join(WORKDIR, 'conf.py')
+    with codecs.open(conf, encoding='utf-8', mode='w') as out:
+        out.write(SPHINX_CONF)
+
+    app.build(False, [rst])
+
     meze_messages.append((messages.INFO,
                           'Source was converted into HTML using Sphinx in '
                           '{:.2f}'.format(time.time() - start)))
     for msg in warning.messages:
         meze_messages.append((messages.WARNING, msg))
+
     content = MezeBuilder.context['body']
+
     return content, meze_messages
 
 
@@ -177,6 +176,7 @@ def rst2html(rst, slug=None):
 
     sphinx_setup()
     content, meze_messages = sphinx_build(rst, slug)
+
     # downgrade headers
     content = re.sub('<h5>(.*)</h5>', '<h6>\\1</h6>', content)
     content = re.sub('<h4>(.*)</h4>', '<h5>\\1</h5>', content)
@@ -185,5 +185,6 @@ def rst2html(rst, slug=None):
     content = re.sub('<h1>(.*)</h1>', '<h2>\\1</h2>', content)
     # correct image source
     content = re.sub('src=\"(.*)\"', 'src=\"/\\1\"', content)
-    content = re.sub('src=\"/(http[s]:.*)\"', 'src=\"\\1\"', content)
+    content = re.sub('src=\"/(http[s]?:.*)\"', 'src=\"\\1\"', content)
+
     return content, meze_messages
