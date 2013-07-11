@@ -22,6 +22,7 @@ If you have easy_install available on your system, just type:
 
    easy_install -U mezzanine-meze
 
+
 Quick start
 -----------
 
@@ -54,7 +55,14 @@ Make the following changes in your project ``settings.py`` file:
      )
      del help_text
 
-3. Add ``MEZE_SETTINGS`` to ``settings.py``::
+   If you have started using Meze after creating database, you may need to
+   make a migration. See field injection `caveats`_ in Mezzanine documentation.
+
+.. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
+
+3. Update ``settings.py`` file.
+
+   Add ``MEZE_SETTINGS``::
 
      MEZE_SETTINGS = {
          'workdir': os.path.join(PROJECT_ROOT, 'meze_workdir'),
@@ -62,7 +70,7 @@ Make the following changes in your project ``settings.py`` file:
 
    Default values are shown. You will need write access to ``workdir``.
 
-4. Add customized `Sphinx`_ configuration to ``settings.py``::
+   Add `configuration`_  options for Sphinx::
 
      SPHINX_CONF = """
      project = u''
@@ -83,15 +91,12 @@ Make the following changes in your project ``settings.py`` file:
      extensions = ['sphinx.ext.intersphinx', 'sphinx.ext.extlinks']
      """
 
+   This file is written to Meze ``workdir``.
+
 .. _configuration: http://sphinx-doc.org/config.html
 
 
-5. If you have started using Meze after creating database, you may need to
-   make a migration. See field injection `caveats`_ in Mezzanine documentation.
-
-.. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
-
-6. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
+4. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
    add ``pygments.css`` file to your template::
 
       {% compress css %}
@@ -109,6 +114,7 @@ Make the following changes in your project ``settings.py`` file:
 
 .. _Pygments: http://pygments.org/
 
+
 How does it work?
 -----------------
 
@@ -124,6 +130,7 @@ Source code
 -----------
 
 https://github.com/abakan/mezzanine-meze
+
 
 Examples
 --------
