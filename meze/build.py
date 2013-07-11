@@ -24,7 +24,8 @@ try:
 except AttributeError:
     SETTINGS = {}
 
-WORKDIR = SETTINGS.get('workdir', settings.PROJECT_ROOT)
+WORKDIR = SETTINGS.get('workdir', os.path.join(settings.PROJECT_ROOT,
+                                               'meze_workdir'))
 
 
 SPHINX_CONF = settings.SPHINX_CONF or """

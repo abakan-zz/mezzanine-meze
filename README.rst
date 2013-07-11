@@ -20,7 +20,7 @@ If you have easy_install available on your system, just type:
 
 ::
 
-   easy_install -U Meze
+   easy_install -U mezzanine-meze
 
 Quick start
 -----------
@@ -54,23 +54,44 @@ Make the following changes in your project ``settings.py`` file:
      )
      del help_text
 
-3. Add ``MEZE_SETTINGS``::
+3. Add ``MEZE_SETTINGS`` to ``settings.py``::
 
      MEZE_SETTINGS = {
-      'workdir': os.path.join(PROJECT_ROOT, 'meze_workdir'),
-      'builder': 'sphinx',
+         'workdir': os.path.join(PROJECT_ROOT, 'meze_workdir'),
      }
 
    Default values are shown. You will need write access to ``workdir``.
-   Sphinx is currently the only builder.
+
+4. Add customized `Sphinx`_ configuration to ``settings.py``::
+
+     SPHINX_CONF = """
+     project = u''
+     copyright = u''
+     version = '0'
+     release = '0'
+     master_doc = 'index'
+     pygments_style = 'sphinx'
+     html_theme = 'default'
+     html_sidebars = {'**': []}
+     html_domain_indices = False
+     html_use_index = False
+     html_show_sourcelink = False
+     html_add_permalinks = None
+     source_suffix = '.rst'
+     intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
+     extlinks = {'wiki': ('http://en.wikipedia.org/wiki/%s', ''),}
+     extensions = ['sphinx.ext.intersphinx', 'sphinx.ext.extlinks']
+     """
+
+.. _configuration: http://sphinx-doc.org/config.html
 
 
-4. If you have started using Meze after creating database, you may need to
+5. If you have started using Meze after creating database, you may need to
    make a migration. See field injection `caveats`_ in Mezzanine documentation.
 
 .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
 
-5. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
+6. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
    add ``pygments.css`` file to your template::
 
       {% compress css %}
@@ -92,11 +113,8 @@ How does it work?
 -----------------
 
 Meze starts a `Sphinx`_ project in ``workdir`` by creating a simple
-configuration file (``conf.py``) and an HTML template
-(``templates/layout.html``). `Configuration` file can be customized to
-add more Sphinx extensions.
+configuration file (``conf.py``).
 
-.. _Configuration: http://sphinx-doc.org/config.html
 
 reStructuredText files are written into ``workdir``, HTML files are built
 using Sphinx, and content of HTML files are stored in the database.
