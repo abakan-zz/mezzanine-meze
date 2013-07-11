@@ -120,3 +120,12 @@ reStructuredText files are written into ``workdir``, HTML files are built
 using Sphinx, and content of HTML files are stored in the database.
 
 
+Source code
+-----------
+
+https://github.com/abakan/mezzanine-meze
+
+Examples
+--------
+
+http://ahmetbakan.com/blog/meze-for-mezzanine/
