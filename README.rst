@@ -8,6 +8,11 @@ pages in `reStructuredText`_ and get them converted into HTML via Sphinx.
 .. _Mezzanine: http://mezzanine.jupo.org/
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 
+Usage Examples
+--------------
+
+See a number of usage examples at: http://ahmetbakan.com/blog/category/meze/
+
 Requirements
 ------------
 
@@ -23,7 +28,7 @@ You can use ``easy_install`` or ``pip``:
    easy_install -U mezzanine-meze
    pip install mezzanine-meze
 
-or download package from `PyPI <https://pypi.python.org/pypi/mezzanine-meze/>`
+or download package from https://pypi.python.org/pypi/mezzanine-meze
 and install using ``setup.py``.
 
 
@@ -130,18 +135,9 @@ reStructuredText files are written into ``workdir``, HTML files are built
 using Sphinx, and content of HTML files are stored in the database.
 
 
-Downloads
----------
-
-https://pypi.python.org/pypi/mezzanine-meze/
-
 Source code
 -----------
 
 https://github.com/abakan/mezzanine-meze
 
 
-Usage Examples
---------------
-
-http://ahmetbakan.com/blog/category/meze/
