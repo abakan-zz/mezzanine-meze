@@ -1,5 +1,3 @@
-import os
-import time
 from copy import deepcopy
 from django import forms
 from django.contrib import admin, messages
@@ -8,11 +6,22 @@ from mezzanine.blog.models import BlogPost
 from mezzanine.pages.admin import PageAdmin
 from mezzanine.pages.models import RichTextPage
 
-from .build import rst2html
+from .meze import rst2html
 
 blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
 blog_fieldsets[0][1]["fields"].insert(-2, "source")
 blog_fieldsets[0][1]["fields"].insert(-2, "convert")
+
+
+def add_meze_messages(request, form):
+    """Add *meze_messages* in *form* data to the *request* object."""
+
+    for level, message in form.data.get('meze_messages', []):
+        if level == messages.WARNING:
+            message = 'Meze (WARNING): ' + message
+        else:
+            message = 'Meze: ' + message
+        messages.add_message(request, level, message)
 
 
 class MezeForm(forms.ModelForm):
@@ -23,21 +32,20 @@ class MezeForm(forms.ModelForm):
 
         if args:
             data = args[0]
-            try:
-                source = data['source']
-            except KeyError:
-                pass
-            else:
-                old_source = None
-                if 'instance' in kwargs:
-                    obj = kwargs['instance']
-                    old_source = obj.source
+            if 'convert' in data and data['convert']:
+                try:
+                    source = data['source']
+                except KeyError:
+                    pass
+                else:
+                    old_source = None
+                    if 'instance' in kwargs:
+                        obj = kwargs['instance']
+                        old_source = obj.source
 
-                if source != old_source:
-                    slug = os.path.join(self.root, data['slug'])
-
-                    (data['content'],
-                     data['meze_messages']) = rst2html(source, slug)
+                    if source != old_source:
+                        (data['content'],
+                         data['meze_messages']) = rst2html(source)
 
         super(MezeForm, self).__init__(*args, **kwargs)
 
@@ -63,9 +71,7 @@ class BlogPostAdmin_(BlogPostAdmin):
 
     def save_model(self, request, obj, form, change):
 
-        for level, message in form.data.get('meze_messages', []):
-            messages.add_message(request, level, message)
-
+        add_meze_messages(request, form)
         super(BlogPostAdmin_, self).save_model(request, obj, form, change)
 
 
@@ -92,9 +98,7 @@ class RichTextAdmin(PageAdmin):
 
     def save_model(self, request, obj, form, change):
 
-        for level, message in form.data.get('meze_messages', []):
-            messages.add_message(request, level, message)
-
+        add_meze_messages(request, form)
         super(RichTextAdmin, self).save_model(request, obj, form, change)
 
 
