@@ -51,7 +51,7 @@ def find_images():
     """Return a mapping of image files in static folder to paths."""
 
     images = {}
-    static_root = settings.STATIC_ROOT or '/home1/ahmetbak/public_html/static/'
+    static_root = settings.STATIC_ROOT
     for root, dirs, files in os.walk(static_root):
         for fn in files:
             if os.path.splitext(fn)[1].lower() in IMGEXTS:
