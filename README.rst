@@ -16,11 +16,15 @@ Requirements
 Installation
 ------------
 
-If you have easy_install available on your system, just type:
+You can use ``easy_install`` or ``pip``:
 
 ::
 
    easy_install -U mezzanine-meze
+   pip install mezzanine-meze
+
+or download package from `PyPI <https://pypi.python.org/pypi/mezzanine-meze/>`
+and install using ``setup.py``.
 
 
 Quick start
@@ -126,13 +130,18 @@ reStructuredText files are written into ``workdir``, HTML files are built
 using Sphinx, and content of HTML files are stored in the database.
 
 
+Downloads
+---------
+
+https://pypi.python.org/pypi/mezzanine-meze/
+
 Source code
 -----------
 
 https://github.com/abakan/mezzanine-meze
 
 
-Examples
---------
+Usage Examples
+--------------
 
-http://ahmetbakan.com/blog/meze-for-mezzanine/
+http://ahmetbakan.com/blog/category/meze/
