@@ -63,6 +63,10 @@ Make the following changes in your project ``settings.py`` file:
    If you have started using Meze after creating database, you may need to
    make a migration. See field injection `caveats`_ in Mezzanine documentation.
 
+<<<<<<< HEAD
+=======
+.. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
+>>>>>>> 31424aa5b99cc1ef89e17a87eebe8f705a107c66
 
 3. Update ``settings.py`` file.
 
@@ -97,6 +101,11 @@ Make the following changes in your project ``settings.py`` file:
 
    This file is written to Meze ``workdir``.
 
+<<<<<<< HEAD
+=======
+.. _configuration: http://sphinx-doc.org/config.html
+
+>>>>>>> 31424aa5b99cc1ef89e17a87eebe8f705a107c66
 
 4. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
    add ``pygments.css`` file to your template::
