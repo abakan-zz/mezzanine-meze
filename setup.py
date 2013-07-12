@@ -6,10 +6,10 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='mezzanine-meze',
-    version='0.1',
+    version='0.2',
     packages=['meze'],
     license='BSD License',
-    description='A simple Mezzanine app to convert rst into html.',
+    description='A Mezzanine app for convert rst to html using Sphinx.',
     long_description=README,
     url='http://github.com/abakan/meze',
     author='Ahmet Bakan',
@@ -29,4 +29,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
+    requires=['Sphinx'],
 )
