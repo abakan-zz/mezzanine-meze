@@ -153,6 +153,10 @@ class Meze(object):
         if not os.path.isdir(workdir):
             os.makedirs(workdir)
 
+        conf = os.path.join(workdir, 'conf.py')
+        with codecs.open(conf, encoding='utf-8', mode='w') as out:
+            out.write(SPHINX_CONF)
+
         start = time.time()
         status = MezeStream(sys.stdout)
         warning = MezeStream(sys.stderr)
@@ -164,10 +168,6 @@ class Meze(object):
         rst = os.path.join(workdir, 'index' + app.config.source_suffix)
         with codecs.open(rst, encoding='utf-8', mode='w') as out:
             out.write(self._source)
-
-        conf = os.path.join(workdir, 'conf.py')
-        with codecs.open(conf, encoding='utf-8', mode='w') as out:
-            out.write(SPHINX_CONF)
 
         app.build(False, [rst])
 
