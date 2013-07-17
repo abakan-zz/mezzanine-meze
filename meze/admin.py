@@ -12,6 +12,7 @@ blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
 blog_fieldsets[0][1]["fields"].insert(-2, "source")
 blog_fieldsets[0][1]["fields"].insert(-2, "convert")
 
+ADMIN_CSS = {'all': ('css/meze_admin.css', 'css/pygments.css')}
 
 def add_meze_messages(request, form):
     """Add *meze_messages* in *form* data to the *request* object."""
@@ -65,8 +66,7 @@ class BlogPostAdmin_(BlogPostAdmin):
 
     class Media:
 
-        css = {'all': ('css/meze_admin.css', 'css/pygments.css')}
-
+        css = ADMIN_CSS
     fieldsets = blog_fieldsets
 
     def save_model(self, request, obj, form, change):
@@ -94,7 +94,7 @@ class RichTextAdmin(PageAdmin):
 
     class Media:
 
-        css = {'all': ('meze_admin.css', 'pygments.css')}
+        css = ADMIN_CSS
 
     def save_model(self, request, obj, form, change):
 
