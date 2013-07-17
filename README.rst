@@ -118,7 +118,7 @@
         <script src="{% static "js/copybutton.js" %}"></script>
         ...
 
-  .. _Pygments: http://pygments.org/
+     .. _Pygments: http://pygments.org/
 
 
   How does it work?
@@ -148,18 +148,16 @@
 Changes
 -------
 
-v0.2.1 (July 17, 2013)
-^^^^^^^^^^^^^^^^^^^^^^
+**v0.2.1 (July 17, 2013)**
 
   * Fixed a bug in `Meze` class that prevented changes in Sphinx configuration
     to take place.
 
-v0.2 (July 12, 2013)
-^^^^^^^^^^^^^^^^^^^^
+**v0.2 (July 12, 2013)**
 
   * Improved handling of image files.
 
-v0.1 (July 11, 2013)
-^^^^^^^^^^^^^^^^^^^^
+**v0.1 (July 11, 2013)**
+
 
   * First release.
