@@ -4,12 +4,19 @@ from distutils.core import setup
 README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
+__version__ = ''
+with open('meze/__init__.py') as inp:
+    for line in inp:
+        if (line.startswith('__version__')):
+            exec(line.strip())
+            break
+
 setup(
     name='mezzanine-meze',
-    version='0.2',
+    version=__version__,
     packages=['meze'],
     license='BSD License',
-    description='A Mezzanine app for convert rst to html using Sphinx.',
+    description='A Mezzanine app to convert reStructuredText into HTML using Sphinx',
     long_description=README,
     url='http://github.com/abakan/meze',
     author='Ahmet Bakan',
