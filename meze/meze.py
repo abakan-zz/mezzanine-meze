@@ -41,6 +41,19 @@ intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
 extlinks = {'wiki': ('http://en.wikipedia.org/wiki/%s', ''),}
 extensions = ['sphinx.ext.intersphinx', 'sphinx.ext.extlinks']"""
 
+SPHINX_CONF_APPEND = """
+
+try:
+    rst_prolog += ''
+except NameError:
+    rst_prolog = ''
+
+rst_prolog += '''
+.. role:: strike
+   :class: strike
+'''
+"""
+
 # all needs to return True to keep a message
 MESSAGE_FILTERS = [
     #lambda msg: 'nonlocal image URI found' not in msg
@@ -156,6 +169,7 @@ class Meze(object):
         conf = os.path.join(workdir, 'conf.py')
         with codecs.open(conf, encoding='utf-8', mode='w') as out:
             out.write(SPHINX_CONF)
+            out.write(SPHINX_CONF_APPEND)
 
         start = time.time()
         status = MezeStream(sys.stdout)
