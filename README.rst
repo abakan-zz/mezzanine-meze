@@ -107,11 +107,12 @@ Make the following changes in your project ``settings.py`` file:
 
       {% compress css %}
       ...
+      <link rel="stylesheet" href="{% static "css/meze.css" %}">
       <link rel="stylesheet" href="{% static "css/pygments.css" %}">
       ...
 
-   For Python code, you can also add ``copybutton.js`` file, which will
-   help displaying code in a copy friendly format::
+   If you are writing Python snippets, you can also add ``copybutton.js``
+   file, to enable a copy friendly display option for code::
 
       {% compress js %}
       ...
@@ -147,6 +148,13 @@ https://github.com/abakan/mezzanine-meze
 
 Changes
 -------
+
+v0.2.2 (July 17, 2013)
+^^^^^^^^^^^^^^^^^^^^^^
+
+  * Searching images in both ``STATIC_ROOT`` and ``MEDIA_ROOT`` folders.
+  * Improved revising image sources in HTML to avoid exceptions when
+    an image file is not found.
 
 v0.2.1 (July 17, 2013)
 ^^^^^^^^^^^^^^^^^^^^^^
