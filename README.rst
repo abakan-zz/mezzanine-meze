@@ -145,8 +145,8 @@ https://github.com/abakan/mezzanine-meze
 Changes
 -------
 
-v0.2.2 (July 17, 2013)
-^^^^^^^^^^^^^^^^^^^^^^
+v0.2.2 (Oct 11, 2013)
+^^^^^^^^^^^^^^^^^^^^^
 
   * Searching images in both ``STATIC_ROOT`` and ``MEDIA_ROOT`` folders.
   * Improved revising image sources in HTML to avoid exceptions when
