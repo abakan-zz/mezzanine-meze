@@ -63,7 +63,6 @@ Make the following changes in your project ``settings.py`` file:
    If you have started using Meze after creating database, you may need to
    make a migration. See field injection `caveats`_ in Mezzanine documentation.
 
-   .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
 
 
 3. Update ``settings.py`` file.
@@ -99,8 +98,6 @@ Make the following changes in your project ``settings.py`` file:
 
    This file is written to Meze ``workdir``.
 
-   .. _configuration: http://sphinx-doc.org/config.html
-
 
 4. Sphinx is using `Pygments`_ for syntax highlighting, so you will need to
    add ``pygments.css`` file to your template::
@@ -118,8 +115,6 @@ Make the following changes in your project ``settings.py`` file:
       ...
       <script src="{% static "js/copybutton.js" %}"></script>
       ...
-
-   .. _Pygments: http://pygments.org/
 
 
 How does it work?
@@ -140,6 +135,7 @@ https://github.com/abakan/mezzanine-meze
 
 
 .. _Sphinx: http://sphinx-doc.org/
+.. _Pygments: http://pygments.org/
 .. _Mezzanine: http://mezzanine.jupo.org/
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 .. _caveats: http://mezzanine.jupo.org/docs/model-customization.html#field-injection-caveats
