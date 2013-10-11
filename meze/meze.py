@@ -158,7 +158,10 @@ class MezeStream(object):
 
     def flush(self, *args, **kwargs):
 
-        self.stream.flush()
+        try:
+            self.stream.flush()
+        except IOError:
+            pass
 
 
 class Meze(object):
