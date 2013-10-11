@@ -61,24 +61,34 @@ MESSAGE_FILTERS = [
 
 
 def find_images():
-    """Return a mapping of image files in static folder to paths."""
+    """Return a dictionary of images in static and media root folders.
+    Dictionary maps image file names to full paths."""
 
     images = {}
     static_root = settings.STATIC_ROOT
-    for root, dirs, files in os.walk(static_root):
-        for fn in files:
-            if os.path.splitext(fn)[1].lower() in IMGEXTS:
-                path = os.path.join(
-                    settings.STATIC_URL.strip('/'),
-                    root[len(static_root):].strip('/'),
-                    fn)
-                items = path.split('/')
-                for i in range(len(items)):
-                    key = '/'.join(items[i:])
-                    if key in images:
-                        break
-                    else:
-                        images[key] = path
+    media_root = settings.MEDIA_ROOT
+    if static_root.startswith(media_root):
+        roots = [media_root]
+    elif media_root.startswith(static_root):
+        roots = [static_root]
+    else:
+        roots = [static_root, media_root]
+
+    for aroot in roots:
+        for root, dirs, files in os.walk(aroot):
+            for fn in files:
+                if os.path.splitext(fn)[1].lower() in IMGEXTS:
+                    path = os.path.join(
+                        settings.STATIC_URL.strip('/'),
+                        root[len(static_root):].strip('/'),
+                        fn)
+                    items = path.split('/')
+                    for i in range(len(items)):
+                        key = '/'.join(items[i:])
+                        if key in images:
+                            break
+                        else:
+                            images[key] = path
     return images
 
 
@@ -204,10 +214,9 @@ class Meze(object):
         unique = set(re.findall('src="(.*?)"', content))
         for src in unique:
             # suppress image related Sphinx messages
-            self._messages = [msg for msg in self._messages
-                              if src not in msg[1]]
-        for src in unique:
+
             if not src.startswith('http'):
+                path = None
                 if src in images:
                     path = images[src]
                 else:
@@ -225,9 +234,11 @@ class Meze(object):
                     self._messages.append((messages.INFO, 'Image source "{}" '
                                            'was substituted with "{}".'
                                            .format(src, path)))
-
-                content = content.replace('="' + src + '"', '="/' + path + '"')
-
+                if path:
+                    content = content.replace('="' + src + '"',
+                                              '="/' + path + '"')
+                    self._messages = [msg for msg in self._messages
+                                      if src not in msg[1]]
         self._content = content
 
     def revise_headers(self):
