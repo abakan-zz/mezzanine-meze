@@ -12,8 +12,8 @@ with open('meze/__init__.py') as inp:
             break
 
 PACKAGE_DATA = {
-    'meze': ['static/js/*.js',
-             'static/css/*.css']}
+    'meze': ['static/meze/js/*.js',
+             'static/meze/css/*.css']}
 
 setup(
     name='mezzanine-meze',

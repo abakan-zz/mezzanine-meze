@@ -151,7 +151,6 @@ v0.3 (Jan 10, 2014)
   * Moved static files to `meze` folder.
   * Added static files to `setup.py`.
 
-
 v0.2.2 (Oct 11, 2013)
 ^^^^^^^^^^^^^^^^^^^^^
 

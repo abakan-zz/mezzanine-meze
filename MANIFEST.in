@@ -1,4 +1,4 @@
 include LICENSE
 include README.rst
-recursive-include meze/static/css *
-recursive-include meze/static/js *
+include meze/static/meze/css/*.css
+include meze/static/meze/js/*.js
