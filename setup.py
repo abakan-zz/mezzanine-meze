@@ -11,10 +11,15 @@ with open('meze/__init__.py') as inp:
             exec(line.strip())
             break
 
+PACKAGE_DATA = {
+    'meze': ['static/js/*.js',
+             'static/css/*.css']}
+
 setup(
     name='mezzanine-meze',
     version=__version__,
     packages=['meze'],
+    package_data=PACKAGE_DATA,
     license='BSD License',
     description='A Mezzanine app to convert reStructuredText into HTML using Sphinx',
     long_description=README,
