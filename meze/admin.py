@@ -12,7 +12,7 @@ blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
 blog_fieldsets[0][1]["fields"].insert(-2, "source")
 blog_fieldsets[0][1]["fields"].insert(-2, "convert")
 
-ADMIN_CSS = {'all': ('css/meze_admin.css', 'css/pygments.css')}
+ADMIN_CSS = {'all': ('meze/css/meze_admin.css', 'meze/css/pygments.css')}
 
 def add_meze_messages(request, form):
     """Add *meze_messages* in *form* data to the *request* object."""

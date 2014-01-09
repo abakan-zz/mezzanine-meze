@@ -104,8 +104,8 @@ Make the following changes in your project ``settings.py`` file:
 
       {% compress css %}
       ...
-      <link rel="stylesheet" href="{% static "css/meze.css" %}">
-      <link rel="stylesheet" href="{% static "css/pygments.css" %}">
+      <link rel="stylesheet" href="{% static "meze/css/meze.css" %}">
+      <link rel="stylesheet" href="{% static "meze/css/pygments.css" %}">
       ...
 
    If you are writing Python snippets, you can also add ``copybutton.js``
@@ -113,7 +113,7 @@ Make the following changes in your project ``settings.py`` file:
 
       {% compress js %}
       ...
-      <script src="{% static "js/copybutton.js" %}"></script>
+      <script src="{% static "meze/js/copybutton.js" %}"></script>
       ...
 
 
@@ -145,9 +145,10 @@ https://github.com/abakan/mezzanine-meze
 Changes
 -------
 
-v0.2.3 (Oct 11, 2013)
+v0.3 (Jan 10, 2014)
 ^^^^^^^^^^^^^^^^^^^^^
 
+  * Moved static files to `meze` folder.
   * Added static files to `setup.py`.
 
 
