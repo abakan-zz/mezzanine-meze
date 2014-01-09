@@ -2,7 +2,6 @@ import os
 from distutils.core import setup
 
 README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
-os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 __version__ = ''
 with open('meze/__init__.py') as inp:
