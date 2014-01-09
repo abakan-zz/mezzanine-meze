@@ -1,5 +1,6 @@
 *.pyc
 *.pyo
+build
 dist
 copy.sh
 MANIFEST

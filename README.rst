@@ -145,6 +145,12 @@ https://github.com/abakan/mezzanine-meze
 Changes
 -------
 
+v0.2.3 (Oct 11, 2013)
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Added static files to `setup.py`.
+
+
 v0.2.2 (Oct 11, 2013)
 ^^^^^^^^^^^^^^^^^^^^^
 
