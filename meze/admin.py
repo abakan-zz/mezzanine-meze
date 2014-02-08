@@ -3,7 +3,7 @@ from django import forms
 from django.contrib import admin, messages
 from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.blog.models import BlogPost
-from mezzanine.pages.admin import PageAdmin
+from mezzanine.pages.admin import PageAdmin, PageAdminForm
 from mezzanine.pages.models import RichTextPage
 
 from .meze import rst2html
@@ -79,7 +79,7 @@ admin.site.unregister(BlogPost)
 admin.site.register(BlogPost, BlogPostAdmin_)
 
 
-class RichTextForm(MezeForm):
+class RichTextForm(MezeForm, PageAdminForm):
 
     root = ""
 
